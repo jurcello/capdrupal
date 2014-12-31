@@ -35,15 +35,6 @@ Capistrano::Configuration.instance(:must_exist).load do
     if download_drush
       drush.get
     end
-    
-    drupal.symlink_shared
-    
-    drush.site_offline
-    drush.updatedb
-    drush.cache_clear
-    drush.feature_revert
-    drush.site_online
-    drush.cache_clear
   end
 
   # This is an optional step that can be defined.
@@ -164,7 +155,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Revert feature"
     task :feature_revert, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all --uri=http://#{drupal_subsite} -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all --uri=http://#{drupal_subsite} -y; true"
     end
 
     desc "Set the site online"
