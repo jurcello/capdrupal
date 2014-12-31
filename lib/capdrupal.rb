@@ -23,6 +23,8 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:deploy_to) { "/var/www/#{application}" }
   _cset(:app_path) { "drupal" }
   _cset :shared_children, false
+
+  _cset(:drupal_subsite) { "default" }
   
   if download_drush
     depend :remote, :command, "curl"
@@ -141,34 +143,34 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Set the site offline"
     task :site_offline, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 1 -y"
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 1 -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 1 --uri=http://#{drupal_subsite} -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 1 --uri=http://#{drupal_subsite} -y"
     end
 
     desc "Backup the database"
     task :backupdb, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} bam-backup"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} bam-backup --uri=http://#{drupal_subsite}"
     end
 
     desc "Run Drupal database migrations if required"
     task :updatedb, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} updatedb -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} updatedb --uri=http://#{drupal_subsite} -y"
     end
 
     desc "Clear the drupal cache"
     task :cache_clear, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} cache-clear all"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} cache-clear all --uri=http://#{drupal_subsite}"
     end
 
     desc "Revert feature"
     task :feature_revert, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all --uri=http://#{drupal_subsite} -y"
     end
 
     desc "Set the site online"
     task :site_online, :on_error => :continue do
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 0 -y"
-      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 0 -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 0 --uri=http://#{drupal_subsite} -y"
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} vset maintenance_mode 0 --uri=http://#{drupal_subsite} -y"
     end
 
   end
