@@ -158,6 +158,11 @@ Capistrano::Configuration.instance(:must_exist).load do
       run "#{drush_cmd} -r #{latest_release}/#{app_path} features-revert-all --uri=http://#{drupal_subsite} -y; true"
     end
 
+    desc "Execute kw-manifests"
+    task :kw_manifests, :on_error => :continue do
+      run "#{drush_cmd} -r #{latest_release}/#{app_path} kw-manifests --uri=http://#{drupal_subsite} -y; true"
+    end
+
     desc "Set the site online"
     task :site_online, :on_error => :continue do
       run "#{drush_cmd} -r #{latest_release}/#{app_path} vset site_offline 0 --uri=http://#{drupal_subsite} -y"
